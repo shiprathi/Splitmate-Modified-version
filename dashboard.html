@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - SplitMate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page">
+        <div class="dashboard-card">
+            <h1>Hello, {{ username }} 💗</h1>
+            <p>Manage your groups and split expenses easily.</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if notifications %}
+                <div class="notification-box">
+                    <h3>🔔 Notifications</h3>
+                    {% for note in notifications %}
+                        <p class="notification-item">{{ note }}</p>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="notification-box">
+                    <h3>🔔 Notifications</h3>
+                    <p class="notification-item">No pending settlements right now 💗</p>
+                </div>
+            {% endif %}
+
+            <div class="btn-group">
+                <a href="{{ url_for('create_group') }}" class="button">Create Group</a>
+                <a href="{{ url_for('join_group') }}" class="button">Join Group</a>
+                <a href="{{ url_for('logout') }}" class="button danger">Logout</a>
+            </div>
+
+            <hr>
+
+            <h2>Your Groups</h2>
+
+            {% if groups %}
+                <div class="group-list">
+                    {% for group in groups %}
+                        <div class="group-card">
+                            <h3>
+                                <a href="{{ url_for('group_dashboard', group_id=group['id']) }}">
+                                    {{ group["group_name"] }}
+                                </a>
+                            </h3>
+                            <p><b>Invite Code:</b> {{ group["invite_code"] }}</p>
+                            <p><b>Created At:</b> {{ group["created_at"] }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>You haven’t joined any groups yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

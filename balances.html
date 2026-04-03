@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Balances - {{ group["group_name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+    <div class="dashboard-card">
+        <h2>{{ group["group_name"] }} — Balances 💗</h2>
+
+        {% if balances %}
+            <div class="group-list">
+                {% for person, amount in balances.items() %}
+                    <div class="group-card">
+                        <p><b>{{ person }}</b></p>
+                        {% if amount >= 0 %}
+                            <p>Gets ₹{{ amount }}</p>
+                        {% else %}
+                            <p>Owes ₹{{ (-amount) }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No balances to show.</p>
+        {% endif %}
+
+        <p><a href="{{ url_for('group_dashboard', group_id=group['id']) }}">Back to Group</a></p>
+    </div>
+</div>
+</body>
+</html>

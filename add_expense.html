@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expense - {{ group["group_name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+    <div class="form-card">
+        <h2>Add Expense 💗</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <label>Payer:</label>
+            <select name="payer_id" required>
+                {% for member in members %}
+                    <option value="{{ member['id'] }}">{{ member['username'] }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="number" name="amount" placeholder="Amount" required>
+
+            <label for="category">Category:</label>
+            <select name="category" required>
+                <option value="Food">Food 🍕</option>
+                <option value="Travel">Travel 🚕</option>
+                <option value="Rent">Rent 🏠</option>
+                <option value="Party">Party 🎉</option>
+                <option value="Other">Other 💖</option>
+            </select>
+
+            <input type="text" name="description" placeholder="Expense description" required>
+
+            <p><b>Shared By:</b></p>
+            {% for member in members %}
+                <input type="checkbox" name="participants" value="{{ member['id'] }}"> {{ member['username'] }}<br>
+            {% endfor %}
+
+            <br>
+            <button type="submit" class="button">Add Expense</button>
+        </form>
+
+        <p><a href="{{ url_for('group_dashboard', group_id=group['id']) }}">Back to Group</a></p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics - {{ group["group_name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="page">
+    <div class="dashboard-card">
+        <h2>{{ group["group_name"] }} — Analytics 📊</h2>
+
+        {% if category_labels and category_values or monthly_labels and monthly_values %}
+            
+            <div class="group-card">
+                <h3>Category Breakdown</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+
+            <br>
+
+            <div class="group-card">
+                <h3>Monthly Spending</h3>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+
+        {% else %}
+            <div class="group-card">
+                <p>No analytics available yet. Add some expenses first 💗</p>
+            </div>
+        {% endif %}
+
+        <p><a href="{{ url_for('group_dashboard', group_id=group['id']) }}">Back to Group</a></p>
+    </div>
+</div>
+
+<script>
+    // SAFE DATA (fix 1)
+    const categoryLabels = {{ category_labels | default([]) | tojson }};
+    const categoryValues = {{ category_values | default([]) | tojson }};
+
+    const monthlyLabels = {{ monthly_labels | default([]) | tojson }};
+    const monthlyValues = {{ monthly_values | default([]) | tojson }};
+
+    // CATEGORY CHART
+    if (categoryLabels.length > 0 && categoryValues.length > 0) {
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'pie',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    label: "Category Spending",
+                    data: categoryValues
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+
+    // MONTHLY CHART
+    if (monthlyLabels.length > 0 && monthlyValues.length > 0) {
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'bar',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'Monthly Spending',
+                    data: monthlyValues
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    }
+</script>
+</body>
+</html>

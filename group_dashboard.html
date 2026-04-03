@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ group["group_name"] }} - SplitMate</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page">
+        <div class="dashboard-card">
+            <h1>{{ group["group_name"] }} 💗</h1>
+            <div class="summary-grid">
+    <div class="summary-card">
+        <h3>👥 Members</h3>
+        <p>{{ member_count }}</p>
+    </div>
+
+    <div class="summary-card">
+        <h3>💸 Expenses</h3>
+        <p>{{ total_expenses }}</p>
+    </div>
+
+    <div class="summary-card">
+        <h3>💰 Total Spent</h3>
+        <p>₹{{ total_amount }}</p>
+    </div>
+
+    <div class="summary-card">
+        <h3>📂 Top Category</h3>
+        <p>{{ top_category }}</p>
+    </div>
+</div>
+{% if reminders %}
+    <div class="notification-box">
+        <h3>⏰ Reminders</h3>
+        {% for reminder in reminders %}
+            <p class="notification-item">{{ reminder }}</p>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="notification-box">
+        <h3>⏰ Reminders</h3>
+        <p class="notification-item">No pending reminders for this group 💗</p>
+    </div>
+{% endif %}
+<hr>
+
+<h2>Activity Timeline 🕒</h2>
+{% if activities %}
+    <div class="group-list">
+        {% for activity in activities %}
+            <div class="group-card">
+                <p><b>{{ activity["action_text"] }}</b></p>
+                <p>{{ activity["created_at"] }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No recent activity yet.</p>
+{% endif %}
+            <div class="group-card">
+                <p><b>Invite Code:</b> {{ group["invite_code"] }}</p>
+                <p><b>Invite Link:</b></p>
+                <p class="invite-link" id="inviteLink">
+                    {{ url_for('join_group_by_link', invite_code=group["invite_code"], _external=True) }}
+                </p>
+                <button class="copy-btn" onclick="copyInviteLink()">Copy Invite Link 📋</button>
+                <p id="copyMessage" class="copy-message"></p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="btn-group">
+                <a href="{{ url_for('add_group_expense', group_id=group['id']) }}" class="button">Add Expense</a>
+                <a href="{{ url_for('group_expenses', group_id=group['id']) }}" class="button">View Expenses</a>
+                <a href="{{ url_for('group_balances', group_id=group['id']) }}" class="button">Balances</a>
+                <a href="{{ url_for('group_settlements', group_id=group['id']) }}" class="button">Settlements</a>
+                <a href="{{ url_for('group_analytics', group_id=group['id']) }}" class="button">Analytics</a>
+                <a href="{{ url_for('dashboard') }}" class="button">Back to Dashboard</a>
+            </div>
+
+            <hr>
+
+            <h2>Members</h2>
+            {% if members %}
+                <div class="group-list">
+                    {% for member in members %}
+                        <div class="group-card">
+                            <p><b>{{ member["username"] }}</b></p>
+                            <p>{{ member["email"] }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No members found.</p>
+            {% endif %}
+
+            <hr>
+
+            <h2>Recent Expenses</h2>
+            {% if expenses %}
+                <div class="group-list">
+                    {% for expense in expenses[:4] %}
+                        <div class="group-card">
+                            <p><b>{{ expense["payer_name"] }}</b> paid ₹{{ expense["amount"] }}</p>
+                            <p>{{ expense["description"] }} [{{ expense["category"] }}]</p>
+                            <p>{{ expense["created_at"] }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if expenses|length > 4 %}
+                    <div class="btn-group">
+                        <a href="{{ url_for('group_expenses', group_id=group['id']) }}" class="button">See All Expenses</a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <p>No expenses added yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function copyInviteLink() {
+            const inviteText = document.getElementById("inviteLink").innerText;
+            navigator.clipboard.writeText(inviteText).then(function() {
+                document.getElementById("copyMessage").innerText = "Invite link copied successfully! 💗";
+            }).catch(function() {
+                document.getElementById("copyMessage").innerText = "Could not copy link. Please copy manually.";
+            });
+        }
+    </script>
+</body>
+</html>

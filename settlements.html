@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settlements - {{ group["group_name"] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+    <div class="dashboard-card">
+        <h2>{{ group["group_name"] }} — Optimized Settlements 💗</h2>
+        <p class="upi-note">UPI payment is currently a mock integration for demo purposes 💗</p>
+
+        {% if settlements %}
+            <div class="group-card">
+                <h3>Optimization Summary ⚡</h3>
+                <p><b>Before Optimization:</b> {{ possible_transactions }} possible transactions</p>
+                <p><b>After Optimization:</b> {{ optimized_transactions }} actual transactions</p>
+                <p><b>Transactions Reduced:</b> {{ transactions_saved }}</p>
+                <p><b>Total Amount Settled:</b> ₹{{ total_amount_settled }}</p>
+            </div>
+
+            <h3>Pending Settlements</h3>
+<div class="group-list">
+    {% for s in settlements %}
+        <div class="group-card">
+            <p><b>{{ s["from"] }}</b> → Pay <b>{{ s["to"] }}</b> ₹{{ s["amount"] }}</p>
+            <p><b>Paid So Far:</b> ₹{{ s["paid_amount"] }}</p>
+            <p><b>Remaining:</b> ₹{{ s["remaining_amount"] }}</p>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('mark_settlement_paid',
+                                    group_id=group['id'],
+                                    from_user=s['from'],
+                                    to_user=s['to'],
+                                    amount=s['amount']) }}"
+                   class="settle-btn">
+                   Mark as Fully Paid ✅
+                </a>
+
+                <button class="upi-btn" onclick="copyUpiLink('{{ s['upi_link'] }}')">
+                    Copy UPI Link 💸
+                </button>
+            </div>
+
+            <form method="POST" action="{{ url_for('partial_pay_settlement', group_id=group['id']) }}">
+                <input type="hidden" name="from_user" value="{{ s['from'] }}">
+                <input type="hidden" name="to_user" value="{{ s['to'] }}">
+                <input type="hidden" name="amount" value="{{ s['amount'] }}">
+
+                <input type="number" step="0.01" name="partial_amount" placeholder="Enter partial amount" required>
+                <button type="submit" class="button">Record Partial Payment 💗</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+        {% else %}
+            <div class="group-card">
+                <p>No pending settlements required 💗</p>
+            </div>
+        {% endif %}
+
+        {% if completed_settlements %}
+    <hr>
+    <h3>Completed Settlements ✅</h3>
+    <div class="group-list">
+        {% for s in completed_settlements %}
+            <div class="group-card">
+                <p><b>{{ s["from_user"] }}</b> paid <b>{{ s["to_user"] }}</b> ₹{{ s["amount"] }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <p><a href="{{ url_for('group_dashboard', group_id=group['id']) }}">Back to Group</a></p>
+    </div>
+</div>
+
+<script>
+    function copyUpiLink(link) {
+        navigator.clipboard.writeText(link).then(function() {
+            alert("UPI link copied! You can use it for demo purposes 💗");
+        }).catch(function() {
+            alert("Could not copy UPI link.");
+        });
+    }
+</script>
+</body>
+</html>
